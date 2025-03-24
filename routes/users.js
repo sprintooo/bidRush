@@ -1,6 +1,12 @@
 const express = require('express');
 const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
+const config = require('../config');
+const dotenv = require('dotenv');
+dotenv.config();
 const router = express.Router();
+
+const SECRET_KEY = config.secretKey;
 
 // user - id, name, email, password
 const users = []
@@ -54,9 +60,17 @@ router.post('/login', (req, res) => {
 
         const { password, ...userWithoutPassword } = user;
 
+        console.log("JWT_SECRET:", config.secretKey);
+
+        const token = jwt.sign(
+            { email: email, role: "USER" }, 
+            config.secretKey, 
+            { expiresIn: '1h' });
+    
+        res.header('Authorization', `Bearer ${token}`);    
         res.json({
             message: "Login successful!",
-            user: userWithoutPassword
+            user: userWithoutPassword,
         });
     });
 });

@@ -1,10 +1,10 @@
 const express = require('express');
-const { route } = require('./test');
+const {authenticateToken} = require('../auth');
 const router = express.Router();
 
 const bids = [];
 
-router.get('/', (req, res) => {
+router.get('/', authenticateToken, (req, res) => {
     const userId = req.query.userId;
 
     if (userId) {

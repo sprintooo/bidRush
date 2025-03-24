@@ -6,7 +6,7 @@ const router = require('./routes')
 const config = require('./config')
 
 const app = express()
-const PORT = process.env.PORT
+const PORT = config.port
 
 // config
 console.log(`Running in ${config.nodeEnv} mode`);
