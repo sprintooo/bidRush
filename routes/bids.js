@@ -1,44 +1,47 @@
 const express = require('express');
-const { route } = require('./test');
 const router = express.Router();
 
-const bids = [];
+const bidsService = require('../services/bidsService');
 
 router.get('/', (req, res) => {
     const userId = req.query.userId;
-
-    if (userId) {
-        const userBids = bids.filter(bid => bid.userId === userId);
-        return res.json(userBids);
-    }
-
-    res.json(bids); // Return all bids if no userId is given
+    const bids = bidsService.getBids(userId);
+    res.json(bids);
 });
-
 
 router.get('/:id', (req, res) => {
     const bidId = req.params.id;
-    res.json({ message: `Fetching bid details for bidId: ${bidId}` });
+    const bid = bidsService.getBidById(bidId);
+
+    if (!bid) {
+        return res.status(404).json({ message: 'Bid not found' });
+    }
+
+    res.json(bid);
 });
 
 router.post('/', (req, res) => {
-    const bid = req.body;
+    const { auctionId, userId, amount } = req.body;
 
-    if (!bid.auctionId || !bid.userId || bid.amount === undefined) {
-        return res.status(400).json({ message: "Missing required fields: auctionId, userId, amount" });
+    if (!auctionId || !userId || amount === undefined) {
+        return res
+            .status(400)
+            .json({ message: 'Missing required fields: auctionId, userId, amount' });
     }
 
-    if (bid.amount <= 0) {
-        return res.status(400).json({ message: "Bid amount must be greater than 0" });
+    const parsedAmount = Number(amount);
+    if (Number.isNaN(parsedAmount) || parsedAmount <= 0) {
+        return res
+            .status(400)
+            .json({ message: 'Bid amount must be a number greater than 0' });
     }
 
-    bids.push(bid);
+    const bid = bidsService.createBid({ auctionId, userId, amount: parsedAmount });
 
     res.json({
-        message: "Bid placed successfully!",
-        bid: bid  // Returning the same bid data received
+        message: 'Bid placed successfully!',
+        bid,
     });
 });
-
 
 module.exports = router;
