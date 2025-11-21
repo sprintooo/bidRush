@@ -1,33 +1,47 @@
 const express = require('express');
 const router = express.Router();
 
-// auction - id, title, description, startingBid, duration.
-// sample auction: { id: 1, title: "Laptop", description: "Brand new laptop", startingBid: 500, duration: 10 }
-const auctions = [];
+const auctionsService = require('../services/auctionsService');
 
 router.post('/', (req, res) => {
-    var auction = req.body;
+    const { title, description, startingBid, duration } = req.body;
 
-    if(!auction.title || !auction.description || !auction.startingBid || !auction.duration) {
-        return res.status(400).json({ message: "Missing required fields: title, description, startingBid, duration" });
+    if (!title || !description || startingBid === undefined || duration === undefined) {
+        return res.status(400).json({
+            message: 'Missing required fields: title, description, startingBid, duration',
+        });
     }
-    if (isNaN(auction.startingBid) || auction.startingBid <= 0) {
-        return res.status(400).json({ message: "Starting bid must be a number greater than 0" });
-    }
-    if (isNaN(auction.duration) || auction.duration <= 0) {
-        return res.status(400).json({ message: "Duration must be a number greater than 0" });
-    }
-       
-    auction = {id: Date.now(), ...auction};
 
-    auctions.push(auction);
+    const parsedStartingBid = Number(startingBid);
+    const parsedDuration = Number(duration);
+
+    if (Number.isNaN(parsedStartingBid) || parsedStartingBid <= 0) {
+        return res.status(400).json({
+            message: 'Starting bid must be a number greater than 0',
+        });
+    }
+
+    if (Number.isNaN(parsedDuration) || parsedDuration <= 0) {
+        return res.status(400).json({
+            message: 'Duration must be a number greater than 0',
+        });
+    }
+
+    const auction = auctionsService.createAuction({
+        title,
+        description,
+        startingBid: parsedStartingBid,
+        duration: parsedDuration,
+    });
+
     res.json({
-        message: "Auction created successfully!",
-        auction: auction
+        message: 'Auction created successfully!',
+        auction,
     });
 });
 
 router.get('/', (req, res) => {
+    const auctions = auctionsService.getAuctions();
     res.json(auctions);
 });
 
