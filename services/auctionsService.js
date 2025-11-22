@@ -17,8 +17,13 @@ function getAuctions() {
     return auctions;
 }
 
+function getAuctionById(id) {
+    return auctions.find((a) => String(a.id) === String(id));
+}
+
 module.exports = {
     createAuction,
     getAuctions,
+    getAuctionById,
 };
 
