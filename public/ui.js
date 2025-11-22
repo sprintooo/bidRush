@@ -27,16 +27,48 @@ async function loadAuctions() {
     list.innerHTML = '<li>Loading...</li>';
 
     try {
-        const auctions = await fetchJSON(`${API_BASE}/auctions`);
+        const [auctions, bids] = await Promise.all([
+            fetchJSON(`${API_BASE}/auctions`),
+            fetchJSON(`${API_BASE}/bids`),
+        ]);
+
         if (!auctions.length) {
             list.innerHTML = '<li>No auctions yet.</li>';
             return;
         }
 
+        const bidsByAuction = bids.reduce((acc, bid) => {
+            const key = String(bid.auctionId);
+            if (!acc[key]) acc[key] = [];
+            acc[key].push(bid);
+            return acc;
+        }, {});
+
         list.innerHTML = '';
         auctions.forEach((a) => {
             const li = document.createElement('li');
-            li.textContent = `#${a.id} - ${a.title} (start: ${a.startingBid}, duration: ${a.duration})`;
+
+            const header = document.createElement('div');
+            header.textContent = `#${a.id} - ${a.title} (start: ${a.startingBid}, duration: ${a.duration})`;
+            li.appendChild(header);
+
+            const bidsList = document.createElement('ul');
+            bidsList.className = 'auction-bids';
+
+            const bidsForAuction = bidsByAuction[String(a.id)] || [];
+            if (!bidsForAuction.length) {
+                const noBidItem = document.createElement('li');
+                noBidItem.textContent = 'No bids yet';
+                bidsList.appendChild(noBidItem);
+            } else {
+                bidsForAuction.forEach((b) => {
+                    const bidLi = document.createElement('li');
+                    bidLi.textContent = `Bid #${b.id} - ${b.amount} by ${b.userId}`;
+                    bidsList.appendChild(bidLi);
+                });
+            }
+
+            li.appendChild(bidsList);
             list.appendChild(li);
         });
     } catch (err) {
