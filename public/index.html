@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <title>BidRush - Simple UI</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+    <header>
+        <h1>BidRush</h1>
+        <p>Simple UI for auctions and bids</p>
+    </header>
+
+    <main>
+        <section id="auctions-section">
+            <h2>Auctions</h2>
+            <button id="refresh-auctions">Refresh Auctions</button>
+            <ul id="auctions-list">
+                <!-- Auctions will be rendered here -->
+            </ul>
+        </section>
+
+        <section id="create-auction-section">
+            <h2>Create Auction</h2>
+            <form id="create-auction-form">
+                <label>
+                    Title
+                    <input type="text" name="title" required />
+                </label>
+                <label>
+                    Description
+                    <textarea name="description" required></textarea>
+                </label>
+                <label>
+                    Starting Bid
+                    <input type="number" name="startingBid" min="1" step="0.01" required />
+                </label>
+                <label>
+                    Duration (minutes)
+                    <input type="number" name="duration" min="1" step="1" required />
+                </label>
+                <button type="submit">Create Auction</button>
+            </form>
+            <div id="create-auction-message" class="message"></div>
+        </section>
+
+        <section id="place-bid-section">
+            <h2>Place Bid</h2>
+            <form id="place-bid-form">
+                <label>
+                    Auction ID
+                    <input type="number" name="auctionId" required />
+                </label>
+                <label>
+                    User ID
+                    <input type="text" name="userId" required />
+                </label>
+                <label>
+                    Amount
+                    <input type="number" name="amount" min="1" step="0.01" required />
+                </label>
+                <button type="submit">Place Bid</button>
+            </form>
+            <div id="place-bid-message" class="message"></div>
+        </section>
+    </main>
+
+    <footer>
+        <small>Backend: <code>/api/auctions</code>, <code>/api/bids</code>, <code>/api/users</code></small>
+    </footer>
+
+    <script src="ui.js" defer></script>
+</body>
+</html>
+
