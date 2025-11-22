@@ -77,6 +77,18 @@ button:hover {
     font-size: 0.9rem;
 }
 
+
+.auction-bids {
+    margin: 0.25rem 0 0.5rem 1rem;
+    padding-left: 1rem;
+    font-size: 0.8rem;
+    color: #4b5563;
+}
+
+.auction-bids li {
+    list-style: disc;
+}
+
 .message {
     margin-top: 0.5rem;
     font-size: 0.85rem;
