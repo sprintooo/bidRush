@@ -61,7 +61,7 @@ function setupCreateAuctionForm() {
                 method: 'POST',
                 body: JSON.stringify(payload),
             });
-            message.textContent = result.message || 'Auction created!';
+            message.textContent = (result && result.message) || '';
             message.classList.add('success');
             form.reset();
             loadAuctions();
@@ -89,7 +89,7 @@ function setupPlaceBidForm() {
                 method: 'POST',
                 body: JSON.stringify(payload),
             });
-            message.textContent = result.message || 'Bid placed!';
+            message.textContent = (result && result.message) || '';
             message.classList.add('success');
             form.reset();
         } catch (err) {
