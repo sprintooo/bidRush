@@ -4,7 +4,17 @@ const app = require('../app');
 describe('Bids endpoints', () => {
   it('should create a bid and fetch by userId', async () => {
     const userId = 'user-1';
-    const auctionId = 'auction-1';
+
+    // First, create an auction so we have a valid startingBid
+    const auctionRes = await request(app).post('/api/auctions').send({
+      title: 'Phone',
+      description: 'New phone',
+      startingBid: 50,
+      duration: 10,
+    });
+
+    expect(auctionRes.status).toBe(200);
+    const auctionId = auctionRes.body.auction.id;
 
     const createRes = await request(app).post('/api/bids').send({
       auctionId,
@@ -26,7 +36,16 @@ describe('Bids endpoints', () => {
 
   it('should reject bids that are not higher than current highest bid', async () => {
     const userId = 'user-2';
-    const auctionId = 'auction-2';
+
+    const auctionRes = await request(app).post('/api/auctions').send({
+      title: 'TV',
+      description: 'LCD TV',
+      startingBid: 100,
+      duration: 10,
+    });
+
+    expect(auctionRes.status).toBe(200);
+    const auctionId = auctionRes.body.auction.id;
 
     // First, place an initial bid
     const firstBidRes = await request(app).post('/api/bids').send({
@@ -46,6 +65,29 @@ describe('Bids endpoints', () => {
 
     expect(lowerBidRes.status).toBe(400);
     expect(lowerBidRes.body).toHaveProperty('message');
+  });
+
+  it('should reject initial bids lower than starting bid', async () => {
+    const userId = 'user-3';
+
+    const auctionRes = await request(app).post('/api/auctions').send({
+      title: 'Car',
+      description: 'Used car',
+      startingBid: 1000,
+      duration: 60,
+    });
+
+    expect(auctionRes.status).toBe(200);
+    const auctionId = auctionRes.body.auction.id;
+
+    const lowBidRes = await request(app).post('/api/bids').send({
+      auctionId,
+      userId,
+      amount: 500, // lower than startingBid
+    });
+
+    expect(lowBidRes.status).toBe(400);
+    expect(lowBidRes.body).toHaveProperty('message');
   });
 });
 
