@@ -4,7 +4,6 @@ const morgan = require('morgan');
 
 const router = require('./routes');
 const config = require('./config');
-const path = require('path');
 
 const app = express();
 
@@ -22,10 +21,6 @@ app.use(cors());
 
 // Body parser
 app.use(express.json());
-
-// Static frontend
-const publicDir = path.join(__dirname, 'public');
-app.use(express.static(publicDir));
 
 // Routes
 app.use(router);
