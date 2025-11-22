@@ -23,5 +23,29 @@ describe('Bids endpoints', () => {
     expect(listRes.body.length).toBeGreaterThan(0);
     expect(listRes.body[0]).toMatchObject({ auctionId, userId, amount: 100 });
   });
+
+  it('should reject bids that are not higher than current highest bid', async () => {
+    const userId = 'user-2';
+    const auctionId = 'auction-2';
+
+    // First, place an initial bid
+    const firstBidRes = await request(app).post('/api/bids').send({
+      auctionId,
+      userId,
+      amount: 150,
+    });
+
+    expect(firstBidRes.status).toBe(200);
+
+    // Try to place a lower or equal bid
+    const lowerBidRes = await request(app).post('/api/bids').send({
+      auctionId,
+      userId,
+      amount: 150,
+    });
+
+    expect(lowerBidRes.status).toBe(400);
+    expect(lowerBidRes.body).toHaveProperty('message');
+  });
 });
 

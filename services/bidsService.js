@@ -24,9 +24,23 @@ function getBidById(id) {
     return bids.find((b) => String(b.id) === String(id));
 }
 
+function getHighestBidAmountForAuction(auctionId) {
+    const auctionBids = bids.filter((bid) => String(bid.auctionId) === String(auctionId));
+
+    if (!auctionBids.length) {
+        return null;
+    }
+
+    return auctionBids.reduce(
+        (max, bid) => (bid.amount > max ? bid.amount : max),
+        auctionBids[0].amount,
+    );
+}
+
 module.exports = {
     createBid,
     getBids,
     getBidById,
+    getHighestBidAmountForAuction,
 };
 
