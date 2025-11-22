@@ -36,6 +36,14 @@ router.post('/', (req, res) => {
             .json({ message: 'Bid amount must be a number greater than 0' });
     }
 
+    const currentHighest = bidsService.getHighestBidAmountForAuction(auctionId);
+
+    if (currentHighest !== null && parsedAmount <= currentHighest) {
+        return res.status(400).json({
+            message: `Bid amount must be greater than current highest bid (${currentHighest})`,
+        });
+    }
+
     const bid = bidsService.createBid({ auctionId, userId, amount: parsedAmount });
 
     res.json({
