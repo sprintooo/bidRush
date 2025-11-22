@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 
 const bidsService = require('../services/bidsService');
+const auctionsService = require('../services/auctionsService');
 
 router.get('/', (req, res) => {
     const userId = req.query.userId;
@@ -34,6 +35,24 @@ router.post('/', (req, res) => {
         return res
             .status(400)
             .json({ message: 'Bid amount must be a number greater than 0' });
+    }
+
+    // Validate auction exists
+    const auctions = auctionsService.getAuctions();
+    const auction = auctions.find((a) => String(a.id) === String(auctionId));
+
+    if (!auction) {
+        return res.status(404).json({ message: 'Auction not found for this bid' });
+    }
+
+    // Determine the minimum allowed bid: max(current highest bid, startingBid)
+    const highestBid = bidsService.getHighestBidAmountForAuction(auctionId);
+    const currentMin = Math.max(highestBid || 0, auction.startingBid);
+
+    if (parsedAmount <= currentMin) {
+        return res.status(400).json({
+            message: `Bid amount must be greater than current highest bid (${currentMin})`,
+        });
     }
 
     const bid = bidsService.createBid({ auctionId, userId, amount: parsedAmount });
